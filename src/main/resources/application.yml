@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: lostart.discord.bot
+
+lostark:
+  url:
+    api-key: ENC(hOTwo43wcp+UlyxCOpiKh/q5UNoFgrmgVXkPGBa+COcXk2ealAG2E8c5quhcruNXXqCBW54p5lds1l4LvJr0uOJosB8PdpyHK7l+oRT9uDOkRQhrKaKU6/9id1O6JNdIFizfxR832ggGyrYfY06QAsOxQb9Agj85kntegJiGcOIvw8mtsxWlNCgdIEAOX//S)
