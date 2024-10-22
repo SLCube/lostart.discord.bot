@@ -20,27 +20,21 @@ public class LostArkIslandScheduleService {
 
     public List<TravelIslandDto> getIslandList() {
         List<LostArkCalendarDto> lostArkCalendarList = repository.getLostArkCalendarList();
-
-        List<LostArkCalendarDto> todayTravelIslandList = filterTravelIsland(lostArkCalendarList);
-        List<TravelIslandDto> travelIslandList = filterTravelIslandReward(todayTravelIslandList);
-
-        return travelIslandList;
+        return filterTravelIsland(lostArkCalendarList);
     }
 
-    private List<LostArkCalendarDto> filterTravelIsland(List<LostArkCalendarDto> calendarList) {
-        return calendarList.stream().filter(calendar -> calendar.getCategoryName().equals(TRAVEL_ISLAND.getCategory()))
+    private List<TravelIslandDto> filterTravelIsland(List<LostArkCalendarDto> calendarList) {
+        return calendarList.stream()
+                // 오늘 날짜의 모험 섬 추출
+                .filter(calendar -> calendar.getCategoryName().equals(TRAVEL_ISLAND.getCategory()))
                 .filter(calendar -> calendar.getStartTimes().stream()
                         .anyMatch(startTime -> startTime.toLocalDate().equals(LocalDate.now())))
-                .toList();
-    }
 
-    private List<TravelIslandDto> filterTravelIslandReward(List<LostArkCalendarDto> todayTravelIslandList) {
-        return todayTravelIslandList.stream()
-                .map(todayTravelIsland -> {
-                    LostArkCalendarDto.RewardItem rewardItem = todayTravelIsland.getRewardItems().get(0);
-                    String islandName = todayTravelIsland.getContentsName();
+                // 오늘 날짜의 이름과 보상 추출
+                .map(calendar -> {
+                    LostArkCalendarDto.RewardItem rewardItem = calendar.getRewardItems().get(0);
+                    String islandName = calendar.getContentsName();
 
-                    // 모험 섬 보상 추출
                     List<LostArkCalendarDto.RewardItem.Item> items = rewardItem.getItems();
                     String rewardName = items.stream()
                             .filter(item -> {
@@ -51,8 +45,6 @@ public class LostArkIslandScheduleService {
                             .findFirst()
                             .map(LostArkCalendarDto.RewardItem.Item::getName)
                             .orElseThrow();
-
-
                     return new TravelIslandDto(islandName, rewardName);
                 })
                 .toList();
