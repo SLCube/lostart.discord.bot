@@ -23,6 +23,7 @@ public class JdaConfig {
     public JDA jda() {
         return JDABuilder.createDefault(discordBotToken)
                 .setActivity(Activity.playing("모험 섬 알리미"))
+
                 .enableIntents(GatewayIntent.MESSAGE_CONTENT)
                 .addEventListeners(travelIslandListener)
                 .build();
