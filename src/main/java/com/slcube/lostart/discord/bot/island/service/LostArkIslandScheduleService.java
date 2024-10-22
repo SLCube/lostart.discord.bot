@@ -37,23 +37,23 @@ public class LostArkIslandScheduleService {
     private List<TravelIslandDto> filterTravelIslandReward(List<LostArkCalendarDto> todayTravelIslandList) {
         return todayTravelIslandList.stream()
                 .map(todayTravelIsland -> {
-                    TravelIslandDto travelIsland = new TravelIslandDto();
-                    travelIsland.setIslandName(todayTravelIsland.getContentsName());    // 모험 섬 이름 할당
-
                     LostArkCalendarDto.RewardItem rewardItem = todayTravelIsland.getRewardItems().get(0);
-                    List<LostArkCalendarDto.RewardItem.Item> items = rewardItem.getItems();
+                    String islandName = todayTravelIsland.getContentsName();
 
                     // 모험 섬 보상 추출
-                    items.stream()
+                    List<LostArkCalendarDto.RewardItem.Item> items = rewardItem.getItems();
+                    String rewardName = items.stream()
                             .filter(item -> {
                                 List<LocalDateTime> startTimes = item.getStartTimes();
                                 return startTimes != null && startTimes.stream()
                                         .anyMatch(startTime -> startTime.toLocalDate().equals(LocalDate.now()));
                             })
                             .findFirst()
-                            .ifPresent(item -> travelIsland.setRewardType(item.getName()));
+                            .map(LostArkCalendarDto.RewardItem.Item::getName)
+                            .orElseThrow();
 
-                    return travelIsland;
+
+                    return new TravelIslandDto(islandName, rewardName);
                 })
                 .toList();
     }
