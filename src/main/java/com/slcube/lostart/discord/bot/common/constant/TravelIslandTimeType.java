@@ -6,9 +6,9 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum TravelIslandTimeType {
-    ALL_TIME("오전, 오후"),
-    MORNING("오전"),
-    AFTERNOON("오후");
+    ALL_TIME("[평일]"),
+    MORNING("[주말 오전]"),
+    AFTERNOON("[주말 오후]");
 
     private final String timeType;
 }

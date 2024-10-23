@@ -4,31 +4,33 @@ import com.slcube.lostart.discord.bot.island.service.LostArkIslandScheduleServic
 import com.slcube.lostart.discord.bot.island.service.dto.TravelIslandDto;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.util.Arrays;
+import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
 import java.util.List;
+import java.util.Locale;
 
-@Slf4j
 @RequiredArgsConstructor
 @Component
 public class TravelIslandListener extends ListenerAdapter {
 
     private final LostArkIslandScheduleService service;
 
-    private static final String TARGET_CHANNEL_ID = "1298213366988406869";
+    @Value("${discord.channel.id}")
+    private String targetChannelId;
 
     @SneakyThrows
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
-        if (!event.getChannel().getId().equals(TARGET_CHANNEL_ID)) return;
+        if (!event.getChannel().getId().equals(targetChannelId)) return;
 
         LocalDate today = LocalDate.now();
         User user = event.getAuthor();
@@ -39,21 +41,23 @@ public class TravelIslandListener extends ListenerAdapter {
             return;
         }
 
-        String[] messageArray = message.getContentDisplay().split(" ");
-        if (messageArray[0].equalsIgnoreCase("!bot")) {
-            String[] messageArgs = Arrays.copyOfRange(messageArray, 1, messageArray.length);
+        String msg = message.getContentDisplay();
+        if (msg.equals("!모험섬")) {
+            List<TravelIslandDto> travelIslandList = service.getIslandList(today);
+            String receiveMessage = "";
+            if (travelIslandList.isEmpty()) {
+                receiveMessage += "모험섬 정보가 없습니다.";
+            } else {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일");
+                String dayOfWeek = today.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.KOREAN);
 
-            for (String msg : messageArgs) {
-                if (msg.equals("모험섬")) {
-                    List<TravelIslandDto> travelIslandList = service.getIslandList(today);
-                    String receiveMessage = "";
-                    for (TravelIslandDto travelIsland : travelIslandList) {
-                        receiveMessage = receiveMessage.concat(travelIsland.getIslandName()).concat(" : ").concat(travelIsland.getRewardType()).concat("\n");
-                    }
+                receiveMessage = receiveMessage.concat(formatter.format(today) + " ").concat(dayOfWeek + " ").concat("모험 섬 정보입니다.\n");
 
-                    textChannel.sendMessage(receiveMessage).queue();
+                for (TravelIslandDto travelIsland : travelIslandList) {
+                    receiveMessage = receiveMessage.concat(travelIsland.getTimeType().getTimeType() + " ").concat(travelIsland.getIslandName()).concat(" : ").concat(travelIsland.getRewardType()).concat("\n");
                 }
             }
+            textChannel.sendMessage(receiveMessage).queue();
         }
     }
 }
