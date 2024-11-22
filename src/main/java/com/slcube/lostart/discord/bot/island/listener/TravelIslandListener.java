@@ -62,7 +62,7 @@ public class TravelIslandListener extends ListenerAdapter {
         TextChannel channel = event.getJDA().getTextChannelById(targetChannelId);
         if (channel != null) {
             long initialDelay = calculateInitialDelay();
-            long period = TimeUnit.MINUTES.toMillis(1);
+            long period = TimeUnit.DAYS.toMillis(1);
             LocalDate today = LocalDate.now();
             event.getJDA().getGatewayPool().scheduleAtFixedRate(
                     () -> channel.sendMessage(getTravelIslandReceiveMessage(today)).queue(),
