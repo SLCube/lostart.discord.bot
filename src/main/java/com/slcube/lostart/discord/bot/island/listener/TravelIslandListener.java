@@ -86,6 +86,7 @@ public class TravelIslandListener extends ListenerAdapter {
     @NotNull
     private String getTravelIslandReceiveMessage() {
         LocalDate today = LocalDate.now();
+        log.info("today : {}", today);
         List<TravelIslandDto> travelIslandList = service.getIslandList(today);
         String receiveMessage = "";
         if (travelIslandList.isEmpty()) {
