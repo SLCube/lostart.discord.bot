@@ -39,7 +39,6 @@ public class TravelIslandListener extends ListenerAdapter {
     public void onMessageReceived(MessageReceivedEvent event) {
         if (!event.getChannel().getId().equals(targetChannelId)) return;
 
-        LocalDate today = LocalDate.now();
         User user = event.getAuthor();
         TextChannel textChannel = event.getChannel().asTextChannel();
         Message message = event.getMessage();
@@ -50,7 +49,7 @@ public class TravelIslandListener extends ListenerAdapter {
 
         String msg = message.getContentDisplay();
         if (msg.equals("!모험섬")) {
-            String receiveMessage = getTravelIslandReceiveMessage(today);
+            String receiveMessage = getTravelIslandReceiveMessage();
             textChannel.sendMessage(receiveMessage).queue();
         }
     }
@@ -63,9 +62,9 @@ public class TravelIslandListener extends ListenerAdapter {
         if (channel != null) {
             long initialDelay = calculateInitialDelay();
             long period = TimeUnit.DAYS.toMillis(1);
-            LocalDate today = LocalDate.now();
+
             event.getJDA().getGatewayPool().scheduleAtFixedRate(
-                    () -> channel.sendMessage(getTravelIslandReceiveMessage(today)).queue(),
+                    () -> channel.sendMessage(getTravelIslandReceiveMessage()).queue(),
                     initialDelay,
                     period,
                     TimeUnit.MILLISECONDS);
@@ -85,7 +84,8 @@ public class TravelIslandListener extends ListenerAdapter {
     }
 
     @NotNull
-    private String getTravelIslandReceiveMessage(LocalDate today) {
+    private String getTravelIslandReceiveMessage() {
+        LocalDate today = LocalDate.now();
         List<TravelIslandDto> travelIslandList = service.getIslandList(today);
         String receiveMessage = "";
         if (travelIslandList.isEmpty()) {
