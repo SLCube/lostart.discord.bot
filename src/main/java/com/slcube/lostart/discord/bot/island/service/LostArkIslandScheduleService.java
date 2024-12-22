@@ -78,15 +78,18 @@ public class LostArkIslandScheduleService {
                             .map(LostArkCalendarDto.RewardItem.Item::getName)
                             .orElseThrow();
 
-                    LocalDateTime localDateTime = items.stream().filter(item -> {
+                    LocalDateTime localDateTime = items.stream()
+                            .filter(item -> {
                                 List<LocalDateTime> startTimes = item.getStartTimes();
                                 return startTimes != null && startTimes.stream()
                                         .anyMatch(startTime -> startTime.toLocalDate().equals(now));
                             })
                             .findFirst()
-                            .map(LostArkCalendarDto.RewardItem.Item::getStartTimes)
                             .orElseThrow()
-                            .get(0);
+                            .getStartTimes().stream()
+                            .filter(time -> time.toLocalDate().equals(now))
+                            .findFirst()
+                            .orElseThrow();
 
                     return new TravelIslandDto(localDateTime, islandName, rewardName);
                 })
