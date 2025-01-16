@@ -11,7 +11,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -83,25 +82,30 @@ public class TravelIslandListener extends ListenerAdapter {
         return ChronoUnit.MILLIS.between(now, targetTime);
     }
 
-    @NotNull
     private String getTravelIslandReceiveMessage() {
         LocalDate today = LocalDate.now();
         log.info("today : {}", today);
         List<TravelIslandDto> travelIslandList = service.getIslandList(today);
+
+        String receiveMessage = createReceiveMessage(travelIslandList, today);
+        log.info("receiveMessage : {}", receiveMessage);
+        return receiveMessage;
+    }
+
+    private String createReceiveMessage(List<TravelIslandDto> travelIslandList, LocalDate today) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일");
+        String dayOfWeek = today.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.KOREAN);
+
         String receiveMessage = "";
         if (travelIslandList.isEmpty()) {
             receiveMessage += "모험섬 정보가 없습니다.";
         } else {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일");
-            String dayOfWeek = today.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.KOREAN);
-
-            receiveMessage = receiveMessage.concat(formatter.format(today) + " ").concat(dayOfWeek + " ").concat("모험 섬 정보입니다.\n");
+            receiveMessage += formatter.format(today) + " " + dayOfWeek + " " + "모험 섬 정보입니다.\n";
 
             for (TravelIslandDto travelIsland : travelIslandList) {
                 receiveMessage = receiveMessage.concat(travelIsland.getTimeType().getTimeType() + " ").concat(travelIsland.getIslandName()).concat(" : ").concat(travelIsland.getRewardType()).concat("\n");
             }
         }
-        log.info("receiveMessage : {}", receiveMessage);
         return receiveMessage;
     }
 }
