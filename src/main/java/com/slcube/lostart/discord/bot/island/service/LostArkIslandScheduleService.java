@@ -35,9 +35,11 @@ public class LostArkIslandScheduleService {
         return calendarList.stream()
                 // 오늘 날짜의 모험 섬 추출
                 .filter(calendar -> calendar.getCategoryName().equals(TRAVEL_ISLAND.getCategory()))
-                .filter(calendar -> calendar.getStartTimes().stream()
-                        .anyMatch(startTime -> startTime.toLocalDate().equals(now)))
-
+                .filter(calendar -> {
+                    List<LocalDateTime> startTimes = calendar.getStartTimes();
+                    return startTimes != null && startTimes.stream()
+                        .anyMatch(startTime -> startTime.toLocalDate().equals(now));
+                })
                 // 오늘 날짜의 이름과 보상 추출
                 .map(calendar -> {
                     LostArkCalendarDto.RewardItem rewardItem = calendar.getRewardItems().get(0);
@@ -61,8 +63,11 @@ public class LostArkIslandScheduleService {
         return calendarList.stream()
                 // 오늘 날짜의 모험 섬 추출
                 .filter(calendar -> calendar.getCategoryName().equals(TRAVEL_ISLAND.getCategory()))
-                .filter(calendar -> calendar.getStartTimes().stream()
-                        .anyMatch(startTime -> startTime.toLocalDate().equals(now)))
+                .filter(calendar -> {
+                    List<LocalDateTime> startTimes = calendar.getStartTimes();
+                    return startTimes != null && startTimes.stream()
+                            .anyMatch(startTime -> startTime.toLocalDate().equals(now));
+                })
                 .map(calendar -> {
                     LostArkCalendarDto.RewardItem rewardItem = calendar.getRewardItems().get(0);
                     String islandName = calendar.getContentsName();
